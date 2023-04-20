@@ -4,6 +4,7 @@ from fastapi import FastAPI
 import requests
 import pandas as pd
 import ast
+import datetime
 
 with st.container():
     st.title("Wine Prediction Model [Past Prediction]")
@@ -18,6 +19,9 @@ with st.container():
     with right_column:
         e_Date = st.date_input("End Date")
 
+st.subheader(type(s_Date))
+st.subheader(type(e_Date))
+
 if st.button('Get Past Predictions'):
 
     response = requests.get(url="http://127.0.0.1:8000/past_predictions")
@@ -27,13 +31,20 @@ if st.button('Get Past Predictions'):
     body = response_dict['prediction_list']['body']
     body = ast.literal_eval(body)
 
+    date_list = []
     body = pd.read_json(body)
+    date = body['created_at']
+    for i in date:
+        i = i.to_pydatetime().date()
+        date_list.append(i)
+
+    st.subheader(date)
     selected_columns = ['fixed_acidity', 'volatile_acidity', 'citric_acid', 'predicted_quality','created_at']
     df_subset = body.loc[:, selected_columns]
 
     if response.status_code == 200:
        # st.subheader(f"Response from API 🚀 = {body}")
-        st.text((pd.DataFrame(df_subset)))
+        st.table((pd.DataFrame(body)))
     else:
         st.subheader(f"Error from API 😞 = {response.json()}")
 
