@@ -5,7 +5,7 @@ import pickle
 DB_HOST = "localhost"
 DB_NAME = "WINE_DB"
 DB_USER = "postgres"
-DB_PASSWORD = "root321"
+DB_PASSWORD = "1106"
 
 # Establish connection with the PostgreSQL database
 conn = psycopg2.connect(

@@ -8,8 +8,8 @@ from fastapi.responses import JSONResponse
 
 def make_predictions(data: List):
     model, features, scaler = load_constants()
+    #print(features,"HEY")
     data = pd.DataFrame(data, columns=list(features))
-
     scaled_features = scaler.transform(data)
     scaled_features_df = pd.DataFrame(scaled_features, columns=list(features))
 

@@ -1,3 +1,4 @@
+import ast
 import json
 import pandas as pd
 import streamlit as st
@@ -42,17 +43,17 @@ with st.container():
         st.header("Features used to Predict")
         st.write("##")
         st.write("""Input variables (based on physicochemical tests):\n
-                    1 - fixed acidity\n
-                    2 - volatile acidity\n
-                    3 - citric acid\n
-                    4 - residual sugar\n
-                    5 - chlorides\n
-                    6 - free sulfur dioxide\n
-                    7 - total sulfur dioxide\n
-                    8 - density\n
-                    9 - pH\n
-                    10 - sulphates\n
-                    11 - alcohol""")
+                     - fixed acidity\n
+                     - volatile acidity\n
+                     - citric acid\n
+                     - residual sugar\n
+                     - chlorides\n
+                     - free sulfur dioxide\n
+                     - total sulfur dioxide\n
+                     - density\n
+                     - pH\n
+                     - sulphates\n
+                     - alcohol""")
 
     with right_column:
         st_lottie(animation, height=300, key='wine')
@@ -76,22 +77,36 @@ inputs = {"fixed_acidity": fixed_acidity, "volatile_acidity": volatile_acidity, 
 l1 = list(inputs.values())
 l2 = []
 l2.append(l1)
-print("L2 : ", l2)
+print("L2 : ", json.dumps(l2))
 if st.button('Predict the Features'):
     res = requests.post(url="http://127.0.0.1:8000/predict", data=json.dumps(l2))
 
-    st.subheader(f"Response from API 🚀 =  {res.text}")
+    json_string = res.text
+    response_dict = json.loads(json_string)
+    body = response_dict['Predictions']['body']
+    
+    st.subheader(f"Predicted Quality 🚀 =  {(body[-4])}")
+
 
 file = st.file_uploader("Insert CSV FILES")
 
 if st.button('Make prediction'):
     csv_file = pd.read_csv(file)
-    features_list = csv_file.columns.tolist()
-    features_dict = {feature: [] for feature in features_list}
+    csv_file = csv_file.drop(['quality','Id'], axis =1)
+    features_list = csv_file.values.tolist()
+    features_list = features_list[:5]
+    
 
-    response = requests.post(url="http://127.0.0.1:8000/make_prediction", data=json.dumps(features_dict))
+    response = requests.post(url="http://127.0.0.1:8000/predict", data=json.dumps(features_list))
 
     if response.status_code == 200:
-        st.subheader(f"Response from API 🚀 = {response.json()}")
+
+        json_string = response.text
+        response_dict = json.loads(json_string)
+        body = response_dict['Predictions']['body']
+        body = ast.literal_eval(body)
+        body = pd.read_json(body)
+        #st.subheader(f"Response from API 🚀 = {body}")
+        st.table(body)
     else:
         st.subheader(f"Error from API 😞 = {response.json()}")

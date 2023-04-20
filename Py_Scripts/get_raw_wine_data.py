@@ -8,7 +8,7 @@ import datetime
 DB_HOST = "localhost"
 DB_NAME = "WINE_DB"
 DB_USER = "postgres"
-DB_PASSWORD = "root321"
+DB_PASSWORD = "1106"
 
 
 class WineDataWithTimestamp(WineData):

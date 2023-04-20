@@ -11,7 +11,7 @@ def save_predictions_to_database(predictions):
             host="localhost",
             database="WINE_DB",
             user="postgres",
-            password="root321"
+            password="1106"
         )
         cur = conn.cursor()
         for prediction in predictions_json:
