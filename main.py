@@ -7,6 +7,7 @@ from Py_Scripts.make_predictions import make_predictions
 
 app = FastAPI()
 
+
 @app.get("/read_raw_winedata")
 def read_raw_winedata():
     try:
@@ -25,6 +26,7 @@ def predict(data: List):
     except Exception as e:
         print(e.args)
         return {"Predictions": [] , "status_code": 500}
+
 
 @app.get("/past_predictions")
 def past_predictions():
