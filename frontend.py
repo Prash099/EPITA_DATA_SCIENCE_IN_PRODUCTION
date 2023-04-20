@@ -1,11 +1,8 @@
 import json
-
 import pandas as pd
 import streamlit as st
 import requests
 from streamlit_lottie import st_lottie
-from typing import Union
-
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -76,9 +73,12 @@ inputs = {"fixed_acidity": fixed_acidity, "volatile_acidity": volatile_acidity, 
           "total_sulfur_dioxide": total_sulfur_dioxide, "density": density, "pH": pH, "sulphates": sulphates,
           "alcohol": alcohol
           }
-
+l1 = list(inputs.values())
+l2 = []
+l2.append(l1)
+print("L2 : ", l2)
 if st.button('Predict the Features'):
-    res = requests.post(url="http://127.0.0.1:8000/features_predict", data=json.dumps(inputs))
+    res = requests.post(url="http://127.0.0.1:8000/predict", data=json.dumps(l2))
 
     st.subheader(f"Response from API 🚀 =  {res.text}")
 
