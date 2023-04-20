@@ -9,7 +9,6 @@ import datetime
 with st.container():
     st.title("Wine Prediction Model [Past Prediction]")
     st.header("DSP - WineWaalas")
-    st.write("- Kirubhaharan Balasubramanian")
 
 with st.container():
     st.write("-----")
@@ -19,8 +18,6 @@ with st.container():
     with right_column:
         e_Date = st.date_input("End Date")
 
-st.subheader(type(s_Date))
-st.subheader(type(e_Date))
 
 if st.button('Get Past Predictions'):
 

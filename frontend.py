@@ -23,7 +23,7 @@ animation = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_RFHPja
 with st.container():
     st.title("Wine Prediction Model")
     st.header("DSP - WineWaalas")
-    st.write("- Kirubhaharan Balasubramanian")
+
 
 with st.container():
     st.write("-----")
