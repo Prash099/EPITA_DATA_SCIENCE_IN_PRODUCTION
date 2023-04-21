@@ -24,7 +24,6 @@ with st.container():
     st.title("Wine Prediction Model")
     st.header("DSP - WineWaalas")
 
-
 with st.container():
     st.write("-----")
     left_column, right_column = st.columns(2)
