@@ -10,3 +10,8 @@ uvicorn
 streamlit_lottie
 joblib
 sqlalchemy
+great_expectations
+great_expectations[sqlalchemy]
+great_expectations[postgresql]
+apache-airflow
+docker

@@ -85,7 +85,8 @@ if st.button('Predict the Features'):
     json_string = res.text
     response_dict = json.loads(json_string)
     body = response_dict['Predictions']['body']
-    st.subheader(f"Predicted Quality 🚀 =  {(body[-4])}")
+    body = ast.literal_eval(body)
+    st.subheader(f"Predicted Quality 🚀 =  {(body[-3])}")
 
 file = st.file_uploader("Insert CSV FILES")
 
@@ -101,8 +102,9 @@ if st.button('Make prediction'):
         json_string = response.text
         response_dict = json.loads(json_string)
         body = response_dict['Predictions']['body']
-        body = ast.literal_eval(body)
-        body = pd.read_json(body)
-        st.table(body)
+        body_ = ast.literal_eval(body)
+        data = json.loads(body_)
+        df = pd.DataFrame(data)
+        st.table(df)
     else:
         st.subheader(f"Error from API 😞 = {response.json()}")
