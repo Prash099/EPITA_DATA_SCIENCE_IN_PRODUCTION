@@ -52,10 +52,10 @@ def validate_csv_files(session, file_folder):
     suite = create_expectation_suite(value_ranges)
     for file_name in os.listdir(file_folder):
         file_path = os.path.join(file_folder, file_name)
-        errors = []  # Initialize errors list for each file
-        df = pd.read_csv(file_path)  # Read the entire DataFrame for the file
+        errors = [] 
+        df = pd.read_csv(file_path) 
 
-        for row_number, row in df.iterrows():  # Iterate over rows of the DataFrame
+        for row_number, row in df.iterrows(): 
             row_values = row.values
             if all(value == "" for value in row_values):
                 errors.append(f"File: {file_name}, Row: {row_number + 1} - All values are empty.")
@@ -68,7 +68,7 @@ def validate_csv_files(session, file_folder):
 
                     try:
                         value = float(value)
-                        expectation = PandasDataset(df, expectation_suite=suite)  # Use the same PandasDataset object for each row
+                        expectation = PandasDataset(df, expectation_suite=suite)  
                         expectation.expect_column_values_to_be_between(column, min_value=lower_bound, max_value=upper_bound)
 
                         result = expectation.validate()
@@ -91,7 +91,7 @@ def validate_csv_files(session, file_folder):
 def create_expectation_suite(value_ranges):
     suite = ExpectationSuite('my_suite')
 
-    # Expectations for column value ranges
+   
     for column, value_range in value_ranges.items():
         lower_bound, upper_bound = value_range
         expectation_column_value_range = ExpectationConfiguration(
