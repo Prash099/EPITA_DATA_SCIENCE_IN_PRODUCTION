@@ -77,6 +77,16 @@ CREATE TABLE Constants (
     Value TEXT
 );
 
+---------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS Data_Logger;
+
+CREATE TABLE Data_Logger (
+    Id SERIAL PRIMARY KEY,
+    files VARCHAR(500),
+	logs TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------

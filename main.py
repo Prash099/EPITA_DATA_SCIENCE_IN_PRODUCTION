@@ -4,8 +4,6 @@ from Py_Scripts.get_raw_wine_data import get_raw_wine_data
 from Py_Scripts.get_past_predictions import get_past_predictions
 from Py_Scripts.make_predictions import make_predictions
 from Py_Scripts.db_engine import db_engine
-from Py_Scripts.great_expectation import great_expectation
-from Py_Scripts import input_file_great_expectations, output_directory_great_expectations
 
 
 app = FastAPI()
@@ -25,7 +23,6 @@ def read_raw_winedata():
 def predict(data: List):
     try:
         database = db_engine()
-        great_expectation(input_file_great_expectations, output_directory_great_expectations)
         predictions = make_predictions(database['session'], data)
         return {"Predictions": predictions, "status_code": 200}
     except Exception as e:
