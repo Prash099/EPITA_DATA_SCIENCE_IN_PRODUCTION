@@ -1,15 +1,17 @@
 DB_HOST = "localhost"
 DB_NAME = "WINE_DB"
 DB_USER = "postgres"
-DB_PASSWORD = "root321"
+DB_PASSWORD = "1106"
 DB_PORT = "5432"
 
 MODEL_PATH = "Model/model.joblib"
 FEATURE_PATH = "Model/features.joblib"
 SCALAR_PATH = "Model/scaler.joblib"
 
-input_file_great_expectations = 'data/Clean_Data'
-output_directory_great_expectations = 'data/Split_Data'
+input_file_great_expectations = '/Users/kiruba/Documents/GitHub/EPITA_DATA_SCIENCE_IN_PRODUCTION/airflow/data/Clean_Data'
+output_directory_great_expectations = '/Users/kiruba/Documents/GitHub/EPITA_DATA_SCIENCE_IN_PRODUCTION/airflow/data/Split_Data'
+invalid_output_file_great_expectations = '/Users/kiruba/Documents/GitHub/EPITA_DATA_SCIENCE_IN_PRODUCTION/airflow/data/Invalid_Data'
+valid_output_great_expectations = '/Users/kiruba/Documents/GitHub/EPITA_DATA_SCIENCE_IN_PRODUCTION/airflow/data/Valid_Data'
 
 value_ranges = {
     'fixed acidity': (4.6, 15.9),

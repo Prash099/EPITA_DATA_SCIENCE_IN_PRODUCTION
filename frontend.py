@@ -1,4 +1,5 @@
 import ast
+import datetime
 import json
 import pandas as pd
 import streamlit as st
@@ -92,9 +93,11 @@ file = st.file_uploader("Insert CSV FILES")
 
 if st.button('Make prediction'):
     csv_file = pd.read_csv(file)
+    base_filename = datetime.datetime.now().strftime("%Y%m%d")
+    csv_file.to_csv(f"airflow/data/Clean_Data/{base_filename}.csv",index=False)
     csv_file = csv_file.drop(['quality','Id'], axis =1)
     features_list = csv_file.values.tolist()
-    features_list = features_list[:5]
+    # features_list = features_list[:5]
 
     response = requests.post(url="http://127.0.0.1:8000/predict", data=json.dumps(features_list))
 
