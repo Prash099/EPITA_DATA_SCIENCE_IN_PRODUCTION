@@ -19,5 +19,4 @@ default_args = {
 with DAG('great_expectation_folder', default_args=default_args, schedule_interval='*/5 * * * *') as dag:
     t1 = PythonOperator(task_id='great_expectation_folder_task', python_callable=my_python_function, dag=dag)
     t2 = PythonOperator(task_id='trigger_fastapi_task', python_callable=trigger_air_api, dag=dag)
-    
     t1 >> t2
