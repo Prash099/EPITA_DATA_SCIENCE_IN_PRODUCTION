@@ -12,6 +12,7 @@ from Py_Scripts import value_ranges
 from Py_Scripts.db_engine import db_engine
 from Py_Scripts import input_file_great_expectations, output_directory_great_expectations, invalid_output_file_great_expectations, valid_output_great_expectations
 
+
 def split_csv_files(file_path, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     base_filename = datetime.datetime.now().strftime("%Y%m%d")
@@ -29,6 +30,7 @@ def split_csv_files(file_path, output_folder):
 
                 # If the number of rows is less than or equal to 500, save the file directly
                 if len(rows) <= 500:
+                    filename = f"{base_filename}_{filename}"
                     output_file_path = os.path.join(output_folder, filename)
                     output_files.append(output_file_path)
 
@@ -39,7 +41,7 @@ def split_csv_files(file_path, output_folder):
                 else:
                     for i in range(0, len(rows), 500):
                         filename_without_extension = os.path.splitext(filename)[0]
-                        output_file_path = os.path.join(output_folder, f"{base_filename}{filename_without_extension}{i // 500 + 1}.csv")
+                        output_file_path = os.path.join(output_folder, f"{base_filename}_{filename_without_extension}_{i // 500 + 1}.csv")
                         output_files.append(output_file_path)
 
                         with open(output_file_path, 'w', newline='') as output_file:
@@ -50,60 +52,43 @@ def split_csv_files(file_path, output_folder):
     return output_files
 
 
-def validate_csv_files(session, file_folder, invalid_output_file_great_expectations, valid_output_file_great_expectations):
+def validate_csv_files(session, file_folder, invalid_output_file_great_expectations, valid_output_great_expectations):
     suite = create_expectation_suite(value_ranges)
     for file_name in os.listdir(file_folder):
         file_path = os.path.join(file_folder, file_name)
         errors = []
         df = pd.read_csv(file_path)
 
-        rows_to_drop = []
+        expectation = PandasDataset(df, expectation_suite=suite)
+        results = expectation.validate()
+        
+        data_quality_issues = results["results"]
+        invalid_rows_data = pd.DataFrame(columns=df.columns)
+        
+        for expectation_result in data_quality_issues:
+            if not expectation_result["success"]:
+                column = expectation_result["expectation_config"]["kwargs"]["column"]
+                partial_unexpected_list = expectation_result["result"]["partial_unexpected_list"]
+                invalid_rows_data = invalid_rows_data.append(df[df[column].isin(partial_unexpected_list)])
+                errors.append(str(invalid_rows_data))
 
-        for row_number, row in df.iterrows():
-            row_values = row.values
-            if all(value == "" for value in row_values):
-                errors.append(f"File: {file_name}, Row: {row_number + 1} - All values are empty.")
-                rows_to_drop.append(row_number)
 
-            for column, value in row.iteritems():
-                column = column.strip()
-                column_range = value_ranges.get(column)
-                if column_range:
-                    lower_bound, upper_bound = column_range
+        df.drop(invalid_rows_data.index, inplace=True)
+        base_filename = datetime.datetime.now().strftime("%Y%m%d")
 
-                    try:
-                        value = float(value)
-                        expectation = PandasDataset(df, expectation_suite=suite)
-                        expectation.expect_column_values_to_be_between(column, min_value=lower_bound, max_value=upper_bound)
+        invalid_output_file_path = os.path.join(invalid_output_file_great_expectations, file_name)
+        invalid_rows_data.to_csv(invalid_output_file_path, index=False)
 
-                        result = expectation.validate()
-                        if not result.success:
-                            errors.append(f"File: {file_name}, Row: {row_number + 1}, Column: {column} - Value Error: {value}")
-                            rows_to_drop.append(row_number)
-                    except ValueError:
-                        errors.append(f"File: {file_name}, Row: {row_number + 1}, Column: '{column}' - Invalid numeric value.")
-                        rows_to_drop.append(row_number)
-
-                if pd.isnull(value):
-                    errors.append(f"File: {file_name}, Row: {row_number + 1}, Column: '{column}' - Value is empty.")
-                    rows_to_drop.append(row_number)
-
-        dropped_rows_df = df.iloc[list(set(rows_to_drop))]
-        df_cleaned = df.drop(list(set(rows_to_drop)))
-
+        valid_output_file_path = os.path.join(valid_output_great_expectations, file_name)
+        df.to_csv(valid_output_file_path, index=False)
+        
+        
         error = {'filename': file_name, 'errors': errors}
         if len(errors) > 0:
             # Send Errors to DB
             save_data_logs(session, error)
         else:
             pass
-
-        dropped_rows_file_path = os.path.join(invalid_output_file_great_expectations, f"{file_name}")
-        dropped_rows_df.to_csv(dropped_rows_file_path, index=False)
-
-        cleaned_data_file_path = os.path.join(valid_output_file_great_expectations, f"{file_name}")
-        df_cleaned.to_csv(cleaned_data_file_path, index=False)        
-
 
 
 def create_expectation_suite(value_ranges):
@@ -128,9 +113,12 @@ def create_expectation_suite(value_ranges):
     return suite
 
 
+
 def great_expectations_validation(csv_folder_path, split_folder, invalid_output_file_great_expectations, valid_output_file_great_expectations):
     split_csv_files(csv_folder_path, split_folder)
     engine = db_engine()
     session = engine['session']
     validate_csv_files(session, split_folder, invalid_output_file_great_expectations, valid_output_file_great_expectations)
     pass
+
+# great_expectations_validation(input_file_great_expectations, output_directory_great_expectations, invalid_output_file_great_expectations, valid_output_great_expectations)
